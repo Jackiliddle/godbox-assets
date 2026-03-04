@@ -37,6 +37,8 @@ TagManager:
   - QDSUIToggleCheckboxRadio
   - Forest
   - Wildlife
+  - Insect
+  - Flowers
   layers:
   - Default
   - TransparentFX

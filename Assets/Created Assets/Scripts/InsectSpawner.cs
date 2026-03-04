@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 public class InsectSpawner : MonoBehaviour
 {
@@ -9,28 +8,28 @@ public class InsectSpawner : MonoBehaviour
     [Header("Insect Prefabs")]
     public GameObject[] insectPrefabs;
 
+    [Header("Spawn Control")]
+    [Tooltip("Chance a flower will spawn insects at all (0..1). Example 0.25 = 25% of flowers).")]
+    [Range(0f, 1f)]
+    public float spawnChancePerFlower = 0.25f;
+
+    [Tooltip("Hard cap on total insects spawned in the scene. 0 = no cap.")]
+    public int maxTotalInsects = 0;
+
     [Header("Spawn Settings")]
-    public int insectsPerFlower = 3;
+    [Tooltip("How many insects spawn for a chosen flower.")]
+    public int insectsPerChosenFlower = 1;
+
     public float spawnRadiusAroundFlower = 2f;
-    public float maxSpawnSearchDistance = 50f;
-    public int attemptsPerInsect = 8;
 
-    [Header("Ground Detection")]
-    [Tooltip("How far above the flower to start the raycast.")]
-    public float raycastHeight = 50f;
-
-    [Tooltip("How far downward to raycast. Make this big if your flowers can be high up.")]
-    public float raycastDownDistance = 500f;
-
-    [Tooltip("Only raycast against these layers for ground. Set to your ground layer(s).")]
-    public LayerMask groundMask = ~0;
-
-    [Header("Spawn Height")]
-    [Tooltip("Spawn this many units above the ground/navmesh hit.")]
-    public float spawnHeightOffset = 5f;
+    [Header("Butterfly Behaviour")]
+    public float hoverHeight = 5f;
+    public float scaleMultiplier = 10f;
 
     [Header("Optional Tagging")]
     public string insectTag = "Insect";
+
+    int spawnedCount = 0;
 
     void Start()
     {
@@ -50,66 +49,53 @@ public class InsectSpawner : MonoBehaviour
 
         foreach (var flower in flowers)
         {
-            for (int i = 0; i < insectsPerFlower; i++)
+            if (maxTotalInsects > 0 && spawnedCount >= maxTotalInsects)
+                break;
+
+            // Decide if this flower gets insects
+            if (Random.value > spawnChancePerFlower)
+                continue;
+
+            int count = Mathf.Max(0, insectsPerChosenFlower);
+            for (int i = 0; i < count; i++)
             {
-                TrySpawnInsectNearFlower(flower.transform.position);
+                if (maxTotalInsects > 0 && spawnedCount >= maxTotalInsects)
+                    break;
+
+                SpawnInsectForFlower(flower.transform);
+                spawnedCount++;
             }
         }
     }
 
-    void TrySpawnInsectNearFlower(Vector3 flowerPos)
+    void SpawnInsectForFlower(Transform flower)
     {
         var prefab = insectPrefabs[Random.Range(0, insectPrefabs.Length)];
 
-        for (int attempt = 0; attempt < attemptsPerInsect; attempt++)
-        {
-            // Random candidate around flower (XZ)
-            Vector2 r = Random.insideUnitCircle * spawnRadiusAroundFlower;
-            Vector3 candidateXZ = new Vector3(flowerPos.x + r.x, flowerPos.y, flowerPos.z + r.y);
-
-            // Raycast DOWN from above the flower to find ground
-            Vector3 rayStart = new Vector3(candidateXZ.x, flowerPos.y + raycastHeight, candidateXZ.z);
-
-            Vector3 sampleFrom = candidateXZ;
-
-            if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit groundHit, raycastHeight + raycastDownDistance, groundMask))
-            {
-                sampleFrom = groundHit.point;
-            }
-            else
-            {
-                // Fallback: try a reasonable ground-ish Y instead of flower Y
-                sampleFrom = new Vector3(candidateXZ.x, 0f, candidateXZ.z);
-            }
-
-            // Snap to NavMesh
-            if (NavMesh.SamplePosition(sampleFrom, out NavMeshHit hit, maxSpawnSearchDistance, NavMesh.AllAreas))
-            {
-                Spawn(prefab, hit.position);
-                return;
-            }
-        }
-
-        Debug.LogWarning(
-            $"Could not find NavMesh near flower to spawn insect. " +
-            $"FlowerPos={flowerPos}, spawnRadius={spawnRadiusAroundFlower}, maxSearch={maxSpawnSearchDistance}"
+        Vector2 r = Random.insideUnitCircle * spawnRadiusAroundFlower;
+        Vector3 spawnPos = new Vector3(
+            flower.position.x + r.x,
+            flower.position.y + hoverHeight,
+            flower.position.z + r.y
         );
-    }
 
-    void Spawn(GameObject prefab, Vector3 navmeshPos)
-    {
-        Vector3 spawnPos = navmeshPos + Vector3.up * spawnHeightOffset;
+        var go = Instantiate(prefab, spawnPos, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
 
-        var go = Instantiate(prefab, spawnPos, Quaternion.identity);
+        go.transform.localScale *= scaleMultiplier;
 
         if (!string.IsNullOrEmpty(insectTag) && !go.CompareTag(insectTag))
-        {
             go.tag = insectTag;
-        }
 
-        if (go.GetComponent<Wanderer>() == null)
+        var hover = go.GetComponent<ButterflyHoverWander>();
+        if (hover != null)
         {
-            Debug.LogWarning($"{go.name} spawned but has no Wanderer component.");
+            hover.orbitCenter = flower;
+            hover.baseHeight = hoverHeight;
+            hover.flowerTag = flowerTag;
+        }
+        else
+        {
+            Debug.LogWarning($"{go.name} spawned but has no ButterflyHoverWander component.");
         }
     }
 }
