@@ -8,15 +8,27 @@ public class FarmSpawner : MonoBehaviour
     public string animalTag = "Animal";
 
     [Header("Animal Prefabs")]
+    [Tooltip("Prefabs to spawn. Each prefab should have a NavMeshAgent and (optionally) a Wanderer.")]
     public GameObject[] animalPrefabs;
 
     [Header("Spawn Settings")]
     public int animalsPerFarm = 3;
-    public float spawnRadiusAroundFarm = 2f;
 
-    [Header("Map Bounds (20x20)")]
-    public Transform mapCenter;
-    public Vector2 mapSize = new Vector2(20f, 20f);
+    [Tooltip("Random radius around each farm to try spawn candidates.")]
+    public float spawnRadiusAroundFarm = 3f;
+
+    [Tooltip("How far we are allowed to search for a NavMesh point from the candidate.")]
+    public float maxSpawnSearchDistance = 50f;
+
+    [Tooltip("How many random attempts per animal before giving up.")]
+    public int attemptsPerAnimal = 10;
+
+    [Header("Ground Detection")]
+    [Tooltip("Raycast height above candidate point.")]
+    public float raycastHeight = 50f;
+
+    [Tooltip("Only raycast against these layers for ground. Set to your ground layer(s).")]
+    public LayerMask groundMask = ~0; // Everything by default (set this properly!)
 
     void Start()
     {
@@ -33,49 +45,71 @@ public class FarmSpawner : MonoBehaviour
             return;
         }
 
-        if (mapCenter == null)
-        {
-            Debug.LogError("mapCenter is not assigned.");
-            return;
-        }
-
         foreach (var farm in farms)
         {
             for (int i = 0; i < animalsPerFarm; i++)
             {
-                SpawnAnimalNearFarm(farm.transform.position);
+                TrySpawnAnimalNearFarm(farm.transform.position);
             }
         }
     }
 
-    void SpawnAnimalNearFarm(Vector3 farmPos)
+    void TrySpawnAnimalNearFarm(Vector3 farmPos)
     {
         var prefab = animalPrefabs[Random.Range(0, animalPrefabs.Length)];
 
-        Vector2 r = Random.insideUnitCircle * spawnRadiusAroundFarm;
-        Vector3 candidate = new Vector3(farmPos.x + r.x, farmPos.y + 2f, farmPos.z + r.y);
-
-        if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+        for (int attempt = 0; attempt < attemptsPerAnimal; attempt++)
         {
-            var go = Instantiate(prefab, hit.position, Quaternion.identity);
+            // Random candidate around farm (XZ)
+            Vector2 r = Random.insideUnitCircle * spawnRadiusAroundFarm;
+            Vector3 candidateXZ = new Vector3(farmPos.x + r.x, farmPos.y, farmPos.z + r.y);
 
-            if (!go.CompareTag(animalTag))
-                go.tag = animalTag;
+            // Raycast down to find ground point (handles arbitrary Y)
+            Vector3 rayStart = candidateXZ + Vector3.up * raycastHeight;
+            Vector3 sampleFrom = candidateXZ;
 
-            var wander = go.GetComponent<Wanderer>();
-            if (wander != null)
+            if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit groundHit, raycastHeight * 2f, groundMask))
             {
-                wander.mapCenter = mapCenter;
-                wander.mapSize = mapSize;
+                sampleFrom = groundHit.point;
             }
-            else
+
+            // Snap to nearest navmesh within max distance
+            if (NavMesh.SamplePosition(sampleFrom, out NavMeshHit hit, maxSpawnSearchDistance, NavMesh.AllAreas))
             {
-                Debug.LogWarning($"{go.name} spawned but has no Wanderer component.");
+                Spawn(prefab, hit.position);
+                return;
             }
         }
-        else
+
+        // Fallback: try sampling directly around the farm (bigger radius)
+        if (NavMesh.SamplePosition(farmPos, out NavMeshHit fallbackHit, maxSpawnSearchDistance * 2f, NavMesh.AllAreas))
         {
-            Debug.LogWarning("Could not find NavMesh near farm to spawn animal.");
+            Spawn(prefab, fallbackHit.position);
+            return;
+        }
+
+        Debug.LogWarning(
+            $"Could not find NavMesh near farm to spawn animal. " +
+            $"FarmPos={farmPos}, spawnRadius={spawnRadiusAroundFarm}, maxSearch={maxSpawnSearchDistance}, attempts={attemptsPerAnimal}"
+        );
+    }
+
+    void Spawn(GameObject prefab, Vector3 position)
+    {
+        var go = Instantiate(prefab, position, Quaternion.identity);
+
+        // Ensure tag (optional)
+        if (!string.IsNullOrEmpty(animalTag) && !go.CompareTag(animalTag))
+            go.tag = animalTag;
+
+        if (go.GetComponent<NavMeshAgent>() == null)
+        {
+            Debug.LogWarning($"{go.name} spawned but has no NavMeshAgent.");
+        }
+
+        if (go.GetComponent<Wanderer>() == null)
+        {
+            Debug.LogWarning($"{go.name} spawned but has no Wanderer component.");
         }
     }
 }

@@ -8,18 +8,27 @@ public class HouseSpawner : MonoBehaviour
     public string houseTag = "House";
 
     [Header("People Prefabs")]
-    [Tooltip("Prefabs to spawn. Each prefab should be tagged 'People'.")]
+    [Tooltip("Prefabs to spawn. Each prefab should have a NavMeshAgent and (optionally) a Wanderer.")]
     public GameObject[] peoplePrefabs;
 
     [Header("Spawn Settings")]
     public int peoplePerHouse = 2;
-    public float spawnRadiusAroundHouse = 1.5f;
 
-    [Header("Map Bounds (20x20)")]
-    [Tooltip("Center of the map area (your disc).")]
-    public Transform mapCenter;
-    [Tooltip("Width and length of walkable area. 20x20 means x=20 z=20.")]
-    public Vector2 mapSize = new Vector2(20f, 20f);
+    [Tooltip("Random radius around each house to try spawn candidates.")]
+    public float spawnRadiusAroundHouse = 3f;
+
+    [Tooltip("How far we are allowed to search for a NavMesh point from the candidate.")]
+    public float maxSpawnSearchDistance = 50f;
+
+    [Tooltip("How many random attempts per person before giving up.")]
+    public int attemptsPerPerson = 10;
+
+    [Header("Ground Detection")]
+    [Tooltip("Raycast height above candidate point.")]
+    public float raycastHeight = 50f;
+
+    [Tooltip("Only raycast against these layers for ground. Set to your ground layer(s).")]
+    public LayerMask groundMask = ~0; // Everything by default (set this properly!)
 
     void Start()
     {
@@ -36,47 +45,60 @@ public class HouseSpawner : MonoBehaviour
             return;
         }
 
-        if (mapCenter == null)
-        {
-            Debug.LogError("mapCenter is not assigned.");
-            return;
-        }
-
         foreach (var house in houses)
         {
             for (int i = 0; i < peoplePerHouse; i++)
             {
-                SpawnPersonNearHouse(house.transform.position);
+                TrySpawnPersonNearHouse(house.transform.position);
             }
         }
     }
 
-    void SpawnPersonNearHouse(Vector3 housePos)
+    void TrySpawnPersonNearHouse(Vector3 housePos)
     {
         var prefab = peoplePrefabs[Random.Range(0, peoplePrefabs.Length)];
 
-        // Random point near the house
-        Vector2 r = Random.insideUnitCircle * spawnRadiusAroundHouse;
-        Vector3 candidate = new Vector3(housePos.x + r.x, housePos.y + 2f, housePos.z + r.y);
-
-        // Snap to NavMesh if possible
-        if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+        for (int attempt = 0; attempt < attemptsPerPerson; attempt++)
         {
-            var go = Instantiate(prefab, hit.position, Quaternion.identity);
-            var wander = go.GetComponent<Wanderer>();
-            if (wander != null)
+            // Random candidate around house (XZ)
+            Vector2 r = Random.insideUnitCircle * spawnRadiusAroundHouse;
+            Vector3 candidateXZ = new Vector3(housePos.x + r.x, housePos.y, housePos.z + r.y);
+
+            // Raycast down to find ground point (handles arbitrary Y)
+            Vector3 rayStart = candidateXZ + Vector3.up * raycastHeight;
+            Vector3 sampleFrom = candidateXZ;
+
+            if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit groundHit, raycastHeight * 2f, groundMask))
             {
-                wander.mapCenter = mapCenter;
-                wander.mapSize = mapSize;
+                sampleFrom = groundHit.point;
             }
-            else
+
+            // Snap to nearest navmesh within max distance
+            if (NavMesh.SamplePosition(sampleFrom, out NavMeshHit hit, maxSpawnSearchDistance, NavMesh.AllAreas))
             {
-                Debug.LogWarning($"{go.name} spawned but has no Wanderer component.");
+                Spawn(prefab, hit.position);
+                return;
             }
         }
-        else
+
+        Debug.LogWarning(
+            $"Could not find NavMesh near house to spawn person. " +
+            $"HousePos={housePos}, spawnRadius={spawnRadiusAroundHouse}, maxSearch={maxSpawnSearchDistance}, attempts={attemptsPerPerson}"
+        );
+    }
+
+    void Spawn(GameObject prefab, Vector3 position)
+    {
+        var go = Instantiate(prefab, position, Quaternion.identity);
+
+        if (go.GetComponent<NavMeshAgent>() == null)
         {
-            Debug.LogWarning("Could not find NavMesh near house to spawn person.");
+            Debug.LogWarning($"{go.name} spawned but has no NavMeshAgent.");
+        }
+
+        if (go.GetComponent<Wanderer>() == null)
+        {
+            Debug.LogWarning($"{go.name} spawned but has no Wanderer component.");
         }
     }
 }
