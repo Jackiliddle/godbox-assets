@@ -5,6 +5,12 @@ TagManager:
   serializedVersion: 3
   tags:
   - Anchor
+  - SamplesInfoPanel
+  - Animal
+  - Fish
+  - House
+  - Farm
+  - People
   layers:
   - Default
   - TransparentFX
