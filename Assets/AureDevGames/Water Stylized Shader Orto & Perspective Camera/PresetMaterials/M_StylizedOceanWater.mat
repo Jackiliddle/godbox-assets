@@ -115,7 +115,7 @@ Material:
     - _IntersectionFoamTiling: 1.27
     - _LightingHardness: 0.39
     - _LightingSmoothness: 12.34
-    - _NormalScale: 1.61
+    - _NormalScale: 0.61
     - _NormalSpeed: 0.16
     - _NormalStrength: 1.71
     - _OrthographicCamSize: 0
@@ -136,7 +136,7 @@ Material:
     - _SurfaceFoamDirection: 0
     - _SurfaceFoamDistorsion: 0.38
     - _SurfaceFoamSpeed: 0
-    - _SurfaceFoamTiling: 0.53
+    - _SurfaceFoamTiling: 7.11
     - _TileSize: 200
     - _WORLD_SPACE_UV: 1
     - _WaterAlpha: 1
