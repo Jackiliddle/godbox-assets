@@ -102,7 +102,7 @@ Material:
     - _CaveBlend: 0
     - _CaveDistortion: 0
     - _DepthCompareDistance: 0.1
-    - _DepthFadeDistance: 0
+    - _DepthFadeDistance: 10
     - _FoamBlend: 0.09
     - _FresnelPower: 1
     - _GradientRefractionScale: 10
@@ -133,7 +133,7 @@ Material:
     - _RippleStrength: 83.62
     - _SecondaryFoamBlend: 0.06
     - _SkyboxForce: 2.5
-    - _Steps: 24.5
+    - _Steps: 50
     - _SurfaceFoamDirection: 1
     - _SurfaceFoamDistorsion: 1
     - _SurfaceFoamSpeed: 0.24

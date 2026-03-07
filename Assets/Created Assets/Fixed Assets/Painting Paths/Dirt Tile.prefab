@@ -30,7 +30,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1348586663964938900, guid: 0ddeb482a2cf71344ab8eab3028ea551, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.09925
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1348586663964938900, guid: 0ddeb482a2cf71344ab8eab3028ea551, type: 3}
       propertyPath: m_LocalPosition.y
@@ -38,7 +38,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1348586663964938900, guid: 0ddeb482a2cf71344ab8eab3028ea551, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.29265
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1348586663964938900, guid: 0ddeb482a2cf71344ab8eab3028ea551, type: 3}
       propertyPath: m_LocalRotation.w
@@ -74,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1872640652240865326, guid: 0ddeb482a2cf71344ab8eab3028ea551, type: 3}
       propertyPath: m_Name
-      value: Path Tile Variant 1
+      value: Dirt Tile
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

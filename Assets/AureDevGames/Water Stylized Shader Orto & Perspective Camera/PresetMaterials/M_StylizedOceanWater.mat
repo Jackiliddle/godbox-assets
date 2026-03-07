@@ -104,8 +104,8 @@ Material:
     - _DepthFadeDistance: 10
     - _FoamBlend: 0.09
     - _FresnelPower: 1
-    - _GradientRefractionScale: 1
-    - _HorizonDistance: 61.8
+    - _GradientRefractionScale: 10
+    - _HorizonDistance: 78
     - _IntersectionFoamBlend: 1.09
     - _IntersectionFoamCutoff: 3.57
     - _IntersectionFoamDepth: 2.43
@@ -126,17 +126,17 @@ Material:
     - _REFLECTIONS: 0
     - _ReflectionBlend: 0.594
     - _ReflectionDistortion: 0.38
-    - _RefractionScale: 1
+    - _RefractionScale: 10
     - _RefractionSpeed: 0.01
     - _RefractionStrength: 0
     - _RippleStrength: 83.62
     - _SecondaryFoamBlend: 0.06
     - _SkyboxForce: 2.5
-    - _Steps: 61.4
+    - _Steps: 50
     - _SurfaceFoamDirection: 0
-    - _SurfaceFoamDistorsion: 0.6
+    - _SurfaceFoamDistorsion: 0.38
     - _SurfaceFoamSpeed: 0
-    - _SurfaceFoamTiling: 14
+    - _SurfaceFoamTiling: 0.53
     - _TileSize: 200
     - _WORLD_SPACE_UV: 1
     - _WaterAlpha: 1
