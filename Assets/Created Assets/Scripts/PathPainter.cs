@@ -1,29 +1,10 @@
 using UnityEngine;
 
-
-//Keys 1 2 3 TO SWITCH BRUSH, LEFT MOUSE TO PAINT , HOLD AND DRAG TO CONTINUOUSLY PAINT WITH SPACING, RAISE STAMPS OFF SURFACE TO AVOID Z-FIGHTING, OPTIONAL ALIGNMENT TO SURFACE NORMAL, RANDOM YAW AND SCALE VARIATION, AND CLEAN HIERARCHY WITH OPTIONAL PARENTING.
-
 public class PathPainter : MonoBehaviour
 {
-    public enum PaintType
-    {
-        Rock,
-        Water,
-        Dirt
-    }
-
-    [System.Serializable]
-    public class PaintBrush
-    {
-        public PaintType type;
-        public GameObject prefab;
-    }
-
-    [Header("Brushes")]
-    public PaintBrush[] brushes;
-
-    [Tooltip("Which brush starts selected.")]
-    public PaintType currentPaintType = PaintType.Rock;
+    [Header("Stamp Prefab")]
+    [Tooltip("Prefab to place repeatedly (e.g., dirt decal mesh, footprints mesh, path tile).")]
+    public GameObject stampPrefab;
 
     [Tooltip("Optional parent to keep the hierarchy clean.")]
     public Transform stampParent;
@@ -35,20 +16,17 @@ public class PathPainter : MonoBehaviour
     [Tooltip("Raise the stamp slightly off the surface to avoid z-fighting.")]
     public float surfaceOffset = 0.02f;
 
-    [Tooltip("Layer used for painting.")]
+    [Tooltip("Layer used for painting (automatically set to Ground).")]
     public LayerMask paintMask;
 
     [Header("Input")]
     public KeyCode paintKey = KeyCode.Mouse0;
-    public KeyCode rockKey = KeyCode.Alpha1;
-    public KeyCode waterKey = KeyCode.Alpha2;
-    public KeyCode dirtKey = KeyCode.Alpha3;
 
     [Header("Orientation")]
     [Tooltip("Align stamp to surface normal.")]
     public bool alignToSurfaceNormal = true;
 
-    [Tooltip("If true, ignore surface normal and keep upright.")]
+    [Tooltip("If alignToSurfaceNormal is false, use world up.")]
     public bool forceUpright = false;
 
     [Header("Variation")]
@@ -62,38 +40,32 @@ public class PathPainter : MonoBehaviour
     [Tooltip("Camera used for raycasts. Defaults to Camera.main.")]
     public Camera cam;
 
-    private Vector3 lastStampPos;
-    private bool hasLast;
+    Vector3 lastStampPos;
+    bool hasLast;
 
-    private void Awake()
+    void Awake()
     {
         if (cam == null)
             cam = Camera.main;
 
-        // If you want it forced automatically, use this:
+        // Only paint on the Ground layer
         paintMask = LayerMask.GetMask("Ground");
     }
 
-    private void Update()
+    void Update()
     {
-        if (cam == null)
-            return;
-
-        HandleBrushSwitching();
-
-        GameObject currentPrefab = GetCurrentPrefab();
-        if (currentPrefab == null)
+        if (stampPrefab == null || cam == null)
             return;
 
         if (Input.GetKeyDown(paintKey))
         {
             hasLast = false;
-            TryStamp(currentPrefab);
+            TryStamp();
         }
 
         if (Input.GetKey(paintKey))
         {
-            TryStamp(currentPrefab);
+            TryStamp();
         }
 
         if (Input.GetKeyUp(paintKey))
@@ -102,40 +74,7 @@ public class PathPainter : MonoBehaviour
         }
     }
 
-    private void HandleBrushSwitching()
-    {
-        if (Input.GetKeyDown(rockKey))
-        {
-            currentPaintType = PaintType.Rock;
-            Debug.Log("Selected brush: Rock");
-        }
-
-        if (Input.GetKeyDown(waterKey))
-        {
-            currentPaintType = PaintType.Water;
-            Debug.Log("Selected brush: Water");
-        }
-
-        if (Input.GetKeyDown(dirtKey))
-        {
-            currentPaintType = PaintType.Dirt;
-            Debug.Log("Selected brush: Dirt");
-        }
-    }
-
-    private GameObject GetCurrentPrefab()
-    {
-        foreach (PaintBrush brush in brushes)
-        {
-            if (brush.type == currentPaintType)
-                return brush.prefab;
-        }
-
-        Debug.LogWarning($"No prefab assigned for paint type: {currentPaintType}");
-        return null;
-    }
-
-    private void TryStamp(GameObject prefabToPaint)
+    void TryStamp()
     {
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
@@ -159,11 +98,11 @@ public class PathPainter : MonoBehaviour
                 Vector3 rayStart = stepPos + Vector3.up * 5f;
                 if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit stepHit, 20f, paintMask))
                 {
-                    PlaceStamp(prefabToPaint, stepHit.point, stepHit.normal);
+                    PlaceStamp(stepHit.point, stepHit.normal);
                 }
                 else
                 {
-                    PlaceStamp(prefabToPaint, stepPos, hit.normal);
+                    PlaceStamp(stepPos, hit.normal);
                 }
             }
 
@@ -171,13 +110,13 @@ public class PathPainter : MonoBehaviour
         }
         else
         {
-            PlaceStamp(prefabToPaint, hit.point, hit.normal);
+            PlaceStamp(hit.point, hit.normal);
             lastStampPos = pos;
             hasLast = true;
         }
     }
 
-    private void PlaceStamp(GameObject prefabToPaint, Vector3 point, Vector3 normal)
+    void PlaceStamp(Vector3 point, Vector3 normal)
     {
         Vector3 up = forceUpright ? Vector3.up : (alignToSurfaceNormal ? normal : Vector3.up);
         Vector3 pos = point + up.normalized * surfaceOffset;
@@ -196,15 +135,15 @@ public class PathPainter : MonoBehaviour
         if (randomYaw)
         {
             float yaw = Random.Range(yawRange.x, yawRange.y);
-            rot *= Quaternion.Euler(0f, yaw, 0f);
+            rot = rot * Quaternion.Euler(0f, yaw, 0f);
         }
 
-        GameObject go = Instantiate(prefabToPaint, pos, rot, stampParent);
+        GameObject go = Instantiate(stampPrefab, pos, rot, stampParent);
 
         if (randomScale)
         {
             float s = Random.Range(scaleRange.x, scaleRange.y);
-            go.transform.localScale *= s;
+            go.transform.localScale = go.transform.localScale * s;
         }
     }
 }

@@ -22,15 +22,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bc81198431878824b84b216880a2d5d7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -19.609177
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bc81198431878824b84b216880a2d5d7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -33.349754
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bc81198431878824b84b216880a2d5d7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -1.546
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bc81198431878824b84b216880a2d5d7, type: 3}
       propertyPath: m_LocalRotation.w
@@ -82,6 +82,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bc81198431878824b84b216880a2d5d7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4686609473372820955}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bc81198431878824b84b216880a2d5d7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -3340190620103783071}
   m_SourcePrefab: {fileID: 100100000, guid: bc81198431878824b84b216880a2d5d7, type: 3}
 --- !u!1 &5816898434040786664 stripped
 GameObject:
@@ -96,7 +99,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5816898434040786664}
   m_Enabled: 1
-  m_AgentTypeID: 0
+  m_AgentTypeID: -1372625422
   m_Radius: 0.5
   m_Speed: 3.5
   m_Acceleration: 8
@@ -133,3 +136,18 @@ MonoBehaviour:
   bigTurnChance: 0.12
   bigTurnRange: {x: 80, y: 160}
   homePull: 0.35
+--- !u!114 &-3340190620103783071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5816898434040786664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ff8323460a169a42bff5eba1baa1a03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SnapToSand
+  sandLayer:
+    serializedVersion: 2
+    m_Bits: 8
