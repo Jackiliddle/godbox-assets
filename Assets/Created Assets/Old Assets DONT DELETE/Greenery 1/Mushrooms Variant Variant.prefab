@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7977984158649985322
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 956333593859409151, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_Name
+      value: Mushrooms Variant Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 956333593859409151, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.06999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.74
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.61
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198167619419769159, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ebc99c2e053de524698299478e0b7bcf, type: 3}
