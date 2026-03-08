@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 24cfca6963a18bd41a2684df55b8d27d
+timeCreated: 1458065745
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58433
+  packageName: Mesh Wireframe Renderer
+  packageVersion: 1.0
+  assetPath: Assets/WireframeRenderer/Script/StaticWireframeRenderer.cs
+  uploadId: 108002

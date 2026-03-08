@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9b877485e76ca8743813b1608153306a
+timeCreated: 1458068866
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58433
+  packageName: Mesh Wireframe Renderer
+  packageVersion: 1.0
+  assetPath: Assets/WireframeRenderer/Materials/New Material.mat
+  uploadId: 108002

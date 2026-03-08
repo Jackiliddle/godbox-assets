@@ -8,7 +8,8 @@ public class WeatherSystem : MonoBehaviour
         Sunny,
         Rain,
         Cloudy,
-        Storm
+        Storm,
+        ShootingStar
     }
 
     [Header("Timing")]
@@ -17,6 +18,7 @@ public class WeatherSystem : MonoBehaviour
     [Header("Particle Systems")]
     public ParticleSystem rainParticles;
     public ParticleSystem stormParticles;
+    public ParticleSystem shootingStarParticles;
 
     [Header("Lighting")]
     public Light sunLight;
@@ -24,10 +26,12 @@ public class WeatherSystem : MonoBehaviour
     public Color sunnyColor = Color.white;
     public Color cloudyColor = new Color(0.7f, 0.7f, 0.7f);
     public Color stormColor = new Color(0.5f, 0.5f, 0.6f);
+    public Color nightColor = new Color(0.3f, 0.3f, 0.45f);
 
     public float sunnyIntensity = 1.2f;
     public float cloudyIntensity = 0.8f;
     public float stormIntensity = 0.4f;
+    public float nightIntensity = 0.25f;
 
     private WeatherType currentWeather;
 
@@ -40,7 +44,8 @@ public class WeatherSystem : MonoBehaviour
     {
         while (true)
         {
-            WeatherType nextWeather = (WeatherType)Random.Range(0, System.Enum.GetValues(typeof(WeatherType)).Length);
+            WeatherType nextWeather =
+                (WeatherType)Random.Range(0, System.Enum.GetValues(typeof(WeatherType)).Length);
 
             SetWeather(nextWeather);
 
@@ -54,6 +59,7 @@ public class WeatherSystem : MonoBehaviour
 
         rainParticles.Stop();
         stormParticles.Stop();
+        shootingStarParticles.Stop();
 
         switch (type)
         {
@@ -84,6 +90,14 @@ public class WeatherSystem : MonoBehaviour
                 stormParticles.Play();
                 sunLight.color = stormColor;
                 sunLight.intensity = stormIntensity;
+
+                break;
+
+            case WeatherType.ShootingStar:
+
+                shootingStarParticles.Play();
+                sunLight.color = nightColor;
+                sunLight.intensity = nightIntensity;
 
                 break;
         }

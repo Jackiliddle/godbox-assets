@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0a71fc3ef56233e46bac74ba2b1b1478
+timeCreated: 1458132505
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58433
+  packageName: Mesh Wireframe Renderer
+  packageVersion: 1.0
+  assetPath: Assets/WireframeRenderer/ReadMe.pdf
+  uploadId: 108002

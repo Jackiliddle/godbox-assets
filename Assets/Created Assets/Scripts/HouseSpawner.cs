@@ -18,7 +18,7 @@ public class HouseSpawner : MonoBehaviour
     public float spawnRadiusAroundHouse = 3f;
 
     [Tooltip("How far we are allowed to search for a NavMesh point from the candidate.")]
-    public float maxSpawnSearchDistance = 50f;
+    public float maxSpawnSearchDistance = 5f;
 
     [Tooltip("How many random attempts per person before giving up.")]
     public int attemptsPerPerson = 10;
@@ -28,11 +28,19 @@ public class HouseSpawner : MonoBehaviour
     public float raycastHeight = 50f;
 
     [Tooltip("Only raycast against these layers for ground. Set to your ground layer(s).")]
-    public LayerMask groundMask = ~0; // Everything by default (set this properly!)
+    public LayerMask groundMask = ~0;
+
+    [Header("Spawn Placement Safety")]
+    [Tooltip("Spawn slightly above the navmesh point to help the agent bind cleanly.")]
+    public float spawnHeightOffset = 0.2f;
+
+    [Tooltip("Extra navmesh snap radius after instantiating.")]
+    public float postSpawnSnapDistance = 2f;
 
     void Start()
     {
-        var houses = GameObject.FindGameObjectsWithTag(houseTag);
+        GameObject[] houses = GameObject.FindGameObjectsWithTag(houseTag);
+
         if (houses == null || houses.Length == 0)
         {
             Debug.LogError($"No objects found with tag '{houseTag}'.");
@@ -45,7 +53,7 @@ public class HouseSpawner : MonoBehaviour
             return;
         }
 
-        foreach (var house in houses)
+        foreach (GameObject house in houses)
         {
             for (int i = 0; i < peoplePerHouse; i++)
             {
@@ -56,15 +64,13 @@ public class HouseSpawner : MonoBehaviour
 
     void TrySpawnPersonNearHouse(Vector3 housePos)
     {
-        var prefab = peoplePrefabs[Random.Range(0, peoplePrefabs.Length)];
+        GameObject prefab = peoplePrefabs[Random.Range(0, peoplePrefabs.Length)];
 
         for (int attempt = 0; attempt < attemptsPerPerson; attempt++)
         {
-            // Random candidate around house (XZ)
             Vector2 r = Random.insideUnitCircle * spawnRadiusAroundHouse;
             Vector3 candidateXZ = new Vector3(housePos.x + r.x, housePos.y, housePos.z + r.y);
 
-            // Raycast down to find ground point (handles arbitrary Y)
             Vector3 rayStart = candidateXZ + Vector3.up * raycastHeight;
             Vector3 sampleFrom = candidateXZ;
 
@@ -73,8 +79,9 @@ public class HouseSpawner : MonoBehaviour
                 sampleFrom = groundHit.point;
             }
 
-            // Snap to nearest navmesh within max distance
-            if (NavMesh.SamplePosition(sampleFrom, out NavMeshHit hit, maxSpawnSearchDistance, NavMesh.AllAreas))
+            Vector3 probePos = sampleFrom + Vector3.up * 1f;
+
+            if (NavMesh.SamplePosition(probePos, out NavMeshHit hit, maxSpawnSearchDistance, NavMesh.AllAreas))
             {
                 Spawn(prefab, hit.position);
                 return;
@@ -87,16 +94,57 @@ public class HouseSpawner : MonoBehaviour
         );
     }
 
-    void Spawn(GameObject prefab, Vector3 position)
+    void Spawn(GameObject prefab, Vector3 navMeshPosition)
     {
-        var go = Instantiate(prefab, position, Quaternion.identity);
+        Vector3 spawnPos = navMeshPosition + Vector3.up * spawnHeightOffset;
 
-        if (go.GetComponent<NavMeshAgent>() == null)
+        GameObject go = Instantiate(prefab, spawnPos, Quaternion.identity);
+
+        NavMeshAgent agent = go.GetComponent<NavMeshAgent>();
+        if (agent != null)
+        {
+            // Disable first so Unity doesn't try to bind at a bad moment
+            bool wasEnabled = agent.enabled;
+            agent.enabled = false;
+
+            // Move root transform exactly where we want it
+            go.transform.position = spawnPos;
+
+            // Try to snap again from actual spawned position
+            if (NavMesh.SamplePosition(go.transform.position, out NavMeshHit hit, postSpawnSnapDistance, NavMesh.AllAreas))
+            {
+                go.transform.position = hit.position + Vector3.up * spawnHeightOffset;
+            }
+
+            // Re-enable after placement
+            agent.enabled = wasEnabled;
+
+            // Final bind attempt
+            if (agent.enabled && agent.isOnNavMesh == false)
+            {
+                if (NavMesh.SamplePosition(go.transform.position, out NavMeshHit hit2, postSpawnSnapDistance, NavMesh.AllAreas))
+                {
+                    go.transform.position = hit2.position;
+                }
+            }
+
+            // Optional final warp only if agent is already on navmesh
+            if (agent.enabled && agent.isOnNavMesh)
+            {
+                agent.Warp(go.transform.position);
+            }
+            else
+            {
+                Debug.LogWarning($"{go.name} spawned, but NavMeshAgent still failed to bind to NavMesh.");
+            }
+        }
+        else
         {
             Debug.LogWarning($"{go.name} spawned but has no NavMeshAgent.");
         }
 
-        if (go.GetComponent<Wanderer>() == null)
+        Wanderer wanderer = go.GetComponent<Wanderer>();
+        if (wanderer == null)
         {
             Debug.LogWarning($"{go.name} spawned but has no Wanderer component.");
         }

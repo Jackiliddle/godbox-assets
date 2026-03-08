@@ -22,15 +22,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3192c51e4be9f36419e926fd19403778, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -19.609177
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3192c51e4be9f36419e926fd19403778, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -33.349754
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3192c51e4be9f36419e926fd19403778, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.92
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3192c51e4be9f36419e926fd19403778, type: 3}
       propertyPath: m_LocalRotation.w
@@ -85,6 +85,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3192c51e4be9f36419e926fd19403778, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3091009434345360324}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3192c51e4be9f36419e926fd19403778, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5688424373482160482}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3192c51e4be9f36419e926fd19403778, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4555603570741573557}
   m_SourcePrefab: {fileID: 100100000, guid: 3192c51e4be9f36419e926fd19403778, type: 3}
 --- !u!1 &3424096748225499574 stripped
 GameObject:
@@ -99,7 +105,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3424096748225499574}
   m_Enabled: 1
-  m_AgentTypeID: -1372625422
+  m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
   m_Acceleration: 8
@@ -151,3 +157,51 @@ MonoBehaviour:
   sandLayer:
     serializedVersion: 2
     m_Bits: 8
+--- !u!136 &5688424373482160482
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3424096748225499574}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-4555603570741573557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3424096748225499574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e957f3f8b7098814198a64ffc92a83b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PersonInteraction
+  detectHalfWidthX: 1.5
+  detectHalfDepthZ: 1
+  detectHalfHeightY: 1
+  peopleTag: People
+  checkInterval: 0.4
+  interactionChance: 0.25
+  interactionDuration: 4
+  cooldownDuration: 3
+  loveChance: 0.5
+  fightEffectPrefab: {fileID: 1736727820739034701, guid: fa43324e365910943a39aefff6062b3f, type: 3}
+  loveEffectPrefab: {fileID: 2040259922965136989, guid: 263c6b75aab654b47a901d00944067b4, type: 3}
+  effectHeightOffset: 1.2
+  renderersToHide: []
