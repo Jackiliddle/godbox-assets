@@ -103,9 +103,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButterflyHoverWander
   flowerTag: Flowers
   orbitCenter: {fileID: 0}
+  territoryHalfX: 1.5
+  territoryHalfZ: 1
   orbitRadius: 2
   orbitSpeedDegPerSec: 50
-  baseHeight: 1
+  baseHeight: 0
   bobAmount: 0.4
   bobSpeed: 2
   switchSearchRadius: 15
