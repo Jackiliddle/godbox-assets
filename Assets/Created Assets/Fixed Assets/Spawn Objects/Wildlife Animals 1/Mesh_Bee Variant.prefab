@@ -18,15 +18,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 735785170166673066, guid: 80a5bf2f24535f8419899bdb04b94195, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.001
+      value: 0.0005
       objectReference: {fileID: 0}
     - target: {fileID: 735785170166673066, guid: 80a5bf2f24535f8419899bdb04b94195, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.001
+      value: 0.0005
       objectReference: {fileID: 0}
     - target: {fileID: 735785170166673066, guid: 80a5bf2f24535f8419899bdb04b94195, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.001
+      value: 0.0005
       objectReference: {fileID: 0}
     - target: {fileID: 735785170166673066, guid: 80a5bf2f24535f8419899bdb04b94195, type: 3}
       propertyPath: m_LocalPosition.x
@@ -101,7 +101,7 @@ MonoBehaviour:
   orbitCenter: {fileID: 0}
   orbitRadius: 2
   orbitSpeedDegPerSec: 50
-  baseHeight: 5
+  baseHeight: 1
   bobAmount: 0.4
   bobSpeed: 2
   switchSearchRadius: 15
