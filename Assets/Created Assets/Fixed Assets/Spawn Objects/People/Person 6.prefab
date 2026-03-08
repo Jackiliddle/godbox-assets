@@ -93,7 +93,7 @@ PrefabInstance:
       addedObject: {fileID: 2094035639476851821}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 95b1d8ba643634649ac5b43970085e88, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -6641423439109822296}
+      addedObject: {fileID: -5895965772788446908}
   m_SourcePrefab: {fileID: 100100000, guid: 95b1d8ba643634649ac5b43970085e88, type: 3}
 --- !u!1 &1269147294248680088 stripped
 GameObject:
@@ -211,7 +211,7 @@ MonoBehaviour:
   loveEffectPrefab: {fileID: 6988425782177480848, guid: 3c298446b30273a47b4699dede6cc362, type: 3}
   effectHeightOffset: 0.2
   renderersToHide: []
---- !u!95 &-6641423439109822296
+--- !u!95 &-5895965772788446908
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
@@ -220,8 +220,8 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1269147294248680088}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 04ab8a1766d270248bf4a7c3851830cd, type: 2}
+  m_Avatar: {fileID: 9000000, guid: a5d5b7c96ce459847a10d6122922c695, type: 3}
+  m_Controller: {fileID: 9100000, guid: 7fff8df2fbc46454cbba5d7d28a2e258, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

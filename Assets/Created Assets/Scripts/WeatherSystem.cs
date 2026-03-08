@@ -35,8 +35,24 @@ public class WeatherSystem : MonoBehaviour
 
     private WeatherType currentWeather;
 
+    void Awake()
+    {
+        if (rainParticles == null)
+            rainParticles = transform.Find("RainParticles")?.GetComponent<ParticleSystem>();
+
+        if (stormParticles == null)
+            stormParticles = transform.Find("StormParticles")?.GetComponent<ParticleSystem>();
+
+        if (shootingStarParticles == null)
+            shootingStarParticles = transform.Find("ShootingStarParticles")?.GetComponent<ParticleSystem>();
+    }
+
     void Start()
     {
+        if (rainParticles != null) rainParticles.Stop();
+        if (stormParticles != null) stormParticles.Stop();
+        if (shootingStarParticles != null) shootingStarParticles.Stop();
+
         StartCoroutine(WeatherLoop());
     }
 
@@ -57,48 +73,53 @@ public class WeatherSystem : MonoBehaviour
     {
         currentWeather = type;
 
-        rainParticles.Stop();
-        stormParticles.Stop();
-        shootingStarParticles.Stop();
+        if (rainParticles != null) rainParticles.Stop();
+        if (stormParticles != null) stormParticles.Stop();
+        if (shootingStarParticles != null) shootingStarParticles.Stop();
 
         switch (type)
         {
             case WeatherType.Sunny:
-
-                sunLight.color = sunnyColor;
-                sunLight.intensity = sunnyIntensity;
-
+                if (sunLight != null)
+                {
+                    sunLight.color = sunnyColor;
+                    sunLight.intensity = sunnyIntensity;
+                }
                 break;
 
             case WeatherType.Cloudy:
-
-                sunLight.color = cloudyColor;
-                sunLight.intensity = cloudyIntensity;
-
+                if (sunLight != null)
+                {
+                    sunLight.color = cloudyColor;
+                    sunLight.intensity = cloudyIntensity;
+                }
                 break;
 
             case WeatherType.Rain:
-
-                rainParticles.Play();
-                sunLight.color = cloudyColor;
-                sunLight.intensity = cloudyIntensity;
-
+                if (rainParticles != null) rainParticles.Play();
+                if (sunLight != null)
+                {
+                    sunLight.color = cloudyColor;
+                    sunLight.intensity = cloudyIntensity;
+                }
                 break;
 
             case WeatherType.Storm:
-
-                stormParticles.Play();
-                sunLight.color = stormColor;
-                sunLight.intensity = stormIntensity;
-
+                if (stormParticles != null) stormParticles.Play();
+                if (sunLight != null)
+                {
+                    sunLight.color = stormColor;
+                    sunLight.intensity = stormIntensity;
+                }
                 break;
 
             case WeatherType.ShootingStar:
-
-                shootingStarParticles.Play();
-                sunLight.color = nightColor;
-                sunLight.intensity = nightIntensity;
-
+                if (shootingStarParticles != null) shootingStarParticles.Play();
+                if (sunLight != null)
+                {
+                    sunLight.color = nightColor;
+                    sunLight.intensity = nightIntensity;
+                }
                 break;
         }
 

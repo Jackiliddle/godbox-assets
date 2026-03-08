@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class InsectSpawner : MonoBehaviour
@@ -22,6 +23,13 @@ public class InsectSpawner : MonoBehaviour
 
     public float spawnRadiusAroundFlower = 2f;
 
+    [Header("Spawn Timing")]
+    [Tooltip("Delay between each spawned insect.")]
+    public float delayBetweenSpawns = 0.25f;
+
+    [Tooltip("Optional extra delay after each flower is processed.")]
+    public float delayBetweenFlowers = 0.05f;
+
     [Header("Butterfly Behaviour")]
     public float hoverHeight = 5f;
     public float scaleMultiplier = 10f;
@@ -33,38 +41,54 @@ public class InsectSpawner : MonoBehaviour
 
     void Start()
     {
+        StartCoroutine(SpawnInsectsRoutine());
+    }
+
+    IEnumerator SpawnInsectsRoutine()
+    {
         var flowers = GameObject.FindGameObjectsWithTag(flowerTag);
 
         if (flowers == null || flowers.Length == 0)
         {
             Debug.LogError($"No objects found with tag '{flowerTag}'.");
-            return;
+            yield break;
         }
 
         if (insectPrefabs == null || insectPrefabs.Length == 0)
         {
             Debug.LogError("No insectPrefabs assigned.");
-            return;
+            yield break;
         }
 
         foreach (var flower in flowers)
         {
             if (maxTotalInsects > 0 && spawnedCount >= maxTotalInsects)
-                break;
+                yield break;
 
-            // Decide if this flower gets insects
             if (Random.value > spawnChancePerFlower)
+            {
+                if (delayBetweenFlowers > 0f)
+                    yield return new WaitForSeconds(delayBetweenFlowers);
+
                 continue;
+            }
 
             int count = Mathf.Max(0, insectsPerChosenFlower);
+
             for (int i = 0; i < count; i++)
             {
                 if (maxTotalInsects > 0 && spawnedCount >= maxTotalInsects)
-                    break;
+                    yield break;
 
                 SpawnInsectForFlower(flower.transform);
                 spawnedCount++;
+
+                if (delayBetweenSpawns > 0f)
+                    yield return new WaitForSeconds(delayBetweenSpawns);
             }
+
+            if (delayBetweenFlowers > 0f)
+                yield return new WaitForSeconds(delayBetweenFlowers);
         }
     }
 

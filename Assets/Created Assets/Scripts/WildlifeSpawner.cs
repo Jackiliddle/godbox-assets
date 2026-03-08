@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -24,6 +25,13 @@ public class WildlifeSpawner : MonoBehaviour
     [Tooltip("How many random attempts per animal before giving up.")]
     public int attemptsPerWildlife = 10;
 
+    [Header("Spawn Timing")]
+    [Tooltip("Delay between each spawned wildlife animal.")]
+    public float delayBetweenSpawns = 0.5f;
+
+    [Tooltip("Optional extra delay after finishing one forest before starting the next.")]
+    public float delayBetweenForests = 0.2f;
+
     [Header("Ground Detection")]
     [Tooltip("Raycast height above candidate point.")]
     public float raycastHeight = 50f;
@@ -37,17 +45,22 @@ public class WildlifeSpawner : MonoBehaviour
 
     void Start()
     {
+        StartCoroutine(SpawnAllForestsRoutine());
+    }
+
+    IEnumerator SpawnAllForestsRoutine()
+    {
         var forests = GameObject.FindGameObjectsWithTag(forestTag);
         if (forests == null || forests.Length == 0)
         {
             Debug.LogError($"No objects found with tag '{forestTag}'.");
-            return;
+            yield break;
         }
 
         if (wildlifePrefabs == null || wildlifePrefabs.Length == 0)
         {
             Debug.LogError("No wildlifePrefabs assigned.");
-            return;
+            yield break;
         }
 
         foreach (var forest in forests)
@@ -55,7 +68,13 @@ public class WildlifeSpawner : MonoBehaviour
             for (int i = 0; i < wildlifePerForest; i++)
             {
                 TrySpawnWildlifeNearForest(forest.transform.position);
+
+                if (delayBetweenSpawns > 0f)
+                    yield return new WaitForSeconds(delayBetweenSpawns);
             }
+
+            if (delayBetweenForests > 0f)
+                yield return new WaitForSeconds(delayBetweenForests);
         }
     }
 
@@ -65,11 +84,9 @@ public class WildlifeSpawner : MonoBehaviour
 
         for (int attempt = 0; attempt < attemptsPerWildlife; attempt++)
         {
-            // Random candidate around forest (XZ)
             Vector2 r = Random.insideUnitCircle * spawnRadiusAroundForest;
             Vector3 candidateXZ = new Vector3(forestPos.x + r.x, forestPos.y, forestPos.z + r.y);
 
-            // Raycast down to find ground
             Vector3 rayStart = candidateXZ + Vector3.up * raycastHeight;
             Vector3 sampleFrom = candidateXZ;
 
@@ -78,7 +95,6 @@ public class WildlifeSpawner : MonoBehaviour
                 sampleFrom = groundHit.point;
             }
 
-            // Snap to NavMesh
             if (NavMesh.SamplePosition(sampleFrom, out NavMeshHit hit, maxSpawnSearchDistance, NavMesh.AllAreas))
             {
                 Spawn(prefab, hit.position);

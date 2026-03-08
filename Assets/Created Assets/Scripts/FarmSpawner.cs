@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -23,26 +24,38 @@ public class FarmSpawner : MonoBehaviour
     [Tooltip("How many random attempts per animal before giving up.")]
     public int attemptsPerAnimal = 10;
 
+    [Header("Spawn Timing")]
+    [Tooltip("Delay between each spawned animal.")]
+    public float delayBetweenSpawns = 0.5f;
+
+    [Tooltip("Optional extra delay after finishing one farm before starting the next.")]
+    public float delayBetweenFarms = 0.2f;
+
     [Header("Ground Detection")]
     [Tooltip("Raycast height above candidate point.")]
     public float raycastHeight = 50f;
 
     [Tooltip("Only raycast against these layers for ground. Set to your ground layer(s).")]
-    public LayerMask groundMask = ~0; // Everything by default (set this properly!)
+    public LayerMask groundMask = ~0;
 
     void Start()
+    {
+        StartCoroutine(SpawnAllFarmsRoutine());
+    }
+
+    IEnumerator SpawnAllFarmsRoutine()
     {
         var farms = GameObject.FindGameObjectsWithTag(farmTag);
         if (farms == null || farms.Length == 0)
         {
             Debug.LogError($"No objects found with tag '{farmTag}'.");
-            return;
+            yield break;
         }
 
         if (animalPrefabs == null || animalPrefabs.Length == 0)
         {
             Debug.LogError("No animalPrefabs assigned.");
-            return;
+            yield break;
         }
 
         foreach (var farm in farms)
@@ -50,7 +63,13 @@ public class FarmSpawner : MonoBehaviour
             for (int i = 0; i < animalsPerFarm; i++)
             {
                 TrySpawnAnimalNearFarm(farm.transform.position);
+
+                if (delayBetweenSpawns > 0f)
+                    yield return new WaitForSeconds(delayBetweenSpawns);
             }
+
+            if (delayBetweenFarms > 0f)
+                yield return new WaitForSeconds(delayBetweenFarms);
         }
     }
 
@@ -60,11 +79,9 @@ public class FarmSpawner : MonoBehaviour
 
         for (int attempt = 0; attempt < attemptsPerAnimal; attempt++)
         {
-            // Random candidate around farm (XZ)
             Vector2 r = Random.insideUnitCircle * spawnRadiusAroundFarm;
             Vector3 candidateXZ = new Vector3(farmPos.x + r.x, farmPos.y, farmPos.z + r.y);
 
-            // Raycast down to find ground point (handles arbitrary Y)
             Vector3 rayStart = candidateXZ + Vector3.up * raycastHeight;
             Vector3 sampleFrom = candidateXZ;
 
@@ -73,7 +90,6 @@ public class FarmSpawner : MonoBehaviour
                 sampleFrom = groundHit.point;
             }
 
-            // Snap to nearest navmesh within max distance
             if (NavMesh.SamplePosition(sampleFrom, out NavMeshHit hit, maxSpawnSearchDistance, NavMesh.AllAreas))
             {
                 Spawn(prefab, hit.position);
@@ -81,7 +97,6 @@ public class FarmSpawner : MonoBehaviour
             }
         }
 
-        // Fallback: try sampling directly around the farm (bigger radius)
         if (NavMesh.SamplePosition(farmPos, out NavMeshHit fallbackHit, maxSpawnSearchDistance * 2f, NavMesh.AllAreas))
         {
             Spawn(prefab, fallbackHit.position);
@@ -98,7 +113,6 @@ public class FarmSpawner : MonoBehaviour
     {
         var go = Instantiate(prefab, position, Quaternion.identity);
 
-        // Ensure tag (optional)
         if (!string.IsNullOrEmpty(animalTag) && !go.CompareTag(animalTag))
             go.tag = animalTag;
 

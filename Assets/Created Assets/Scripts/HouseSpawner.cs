@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -23,6 +24,13 @@ public class HouseSpawner : MonoBehaviour
     [Tooltip("How many random attempts per person before giving up.")]
     public int attemptsPerPerson = 10;
 
+    [Header("Spawn Timing")]
+    [Tooltip("Delay between each spawned person.")]
+    public float delayBetweenSpawns = 0.5f;
+
+    [Tooltip("Optional extra delay after finishing one house before starting the next.")]
+    public float delayBetweenHouses = 0.2f;
+
     [Header("Ground Detection")]
     [Tooltip("Raycast height above candidate point.")]
     public float raycastHeight = 50f;
@@ -39,18 +47,23 @@ public class HouseSpawner : MonoBehaviour
 
     void Start()
     {
+        StartCoroutine(SpawnAllHousesRoutine());
+    }
+
+    IEnumerator SpawnAllHousesRoutine()
+    {
         GameObject[] houses = GameObject.FindGameObjectsWithTag(houseTag);
 
         if (houses == null || houses.Length == 0)
         {
             Debug.LogError($"No objects found with tag '{houseTag}'.");
-            return;
+            yield break;
         }
 
         if (peoplePrefabs == null || peoplePrefabs.Length == 0)
         {
             Debug.LogError("No peoplePrefabs assigned.");
-            return;
+            yield break;
         }
 
         foreach (GameObject house in houses)
@@ -58,7 +71,13 @@ public class HouseSpawner : MonoBehaviour
             for (int i = 0; i < peoplePerHouse; i++)
             {
                 TrySpawnPersonNearHouse(house.transform.position);
+
+                if (delayBetweenSpawns > 0f)
+                    yield return new WaitForSeconds(delayBetweenSpawns);
             }
+
+            if (delayBetweenHouses > 0f)
+                yield return new WaitForSeconds(delayBetweenHouses);
         }
     }
 
@@ -103,23 +122,18 @@ public class HouseSpawner : MonoBehaviour
         NavMeshAgent agent = go.GetComponent<NavMeshAgent>();
         if (agent != null)
         {
-            // Disable first so Unity doesn't try to bind at a bad moment
             bool wasEnabled = agent.enabled;
             agent.enabled = false;
 
-            // Move root transform exactly where we want it
             go.transform.position = spawnPos;
 
-            // Try to snap again from actual spawned position
             if (NavMesh.SamplePosition(go.transform.position, out NavMeshHit hit, postSpawnSnapDistance, NavMesh.AllAreas))
             {
                 go.transform.position = hit.position + Vector3.up * spawnHeightOffset;
             }
 
-            // Re-enable after placement
             agent.enabled = wasEnabled;
 
-            // Final bind attempt
             if (agent.enabled && agent.isOnNavMesh == false)
             {
                 if (NavMesh.SamplePosition(go.transform.position, out NavMeshHit hit2, postSpawnSnapDistance, NavMesh.AllAreas))
@@ -128,7 +142,6 @@ public class HouseSpawner : MonoBehaviour
                 }
             }
 
-            // Optional final warp only if agent is already on navmesh
             if (agent.enabled && agent.isOnNavMesh)
             {
                 agent.Warp(go.transform.position);
