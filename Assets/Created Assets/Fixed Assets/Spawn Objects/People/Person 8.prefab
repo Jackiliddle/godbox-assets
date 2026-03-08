@@ -131,8 +131,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6435db4d9eaff8f40aca62ba40b3375e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Wanderer
-  wanderRadius: 10
-  useSquareTerritory: 0
+  territoryHalfX: 1.5
+  territoryHalfZ: 1
   minWait: 0.5
   maxWait: 2
   waypointTolerance: 0.7
@@ -142,6 +142,9 @@ MonoBehaviour:
   bigTurnChance: 0.12
   bigTurnRange: {x: 80, y: 160}
   homePull: 0.35
+  agentSpeed: 0.6
+  agentAcceleration: 2
+  agentAngularSpeed: 180
 --- !u!114 &7973218148170257903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -197,11 +200,11 @@ MonoBehaviour:
   detectHalfHeightY: 1
   peopleTag: People
   checkInterval: 0.4
-  interactionChance: 0.25
+  interactionChance: 0.1
   interactionDuration: 4
   cooldownDuration: 3
   loveChance: 0.5
   fightEffectPrefab: {fileID: 1736727820739034701, guid: fa43324e365910943a39aefff6062b3f, type: 3}
-  loveEffectPrefab: {fileID: 2040259922965136989, guid: 263c6b75aab654b47a901d00944067b4, type: 3}
-  effectHeightOffset: 1.2
+  loveEffectPrefab: {fileID: 6988425782177480848, guid: 3c298446b30273a47b4699dede6cc362, type: 3}
+  effectHeightOffset: 0.2
   renderersToHide: []

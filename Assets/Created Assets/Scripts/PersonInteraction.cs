@@ -86,7 +86,6 @@ public class PersonInteraction : MonoBehaviour
     void TryFindInteractionPartner()
     {
         Vector3 halfExtents = new Vector3(detectHalfWidthX, detectHalfHeightY, detectHalfDepthZ);
-
         Collider[] hits = Physics.OverlapBox(transform.position, halfExtents, Quaternion.identity);
 
         PersonInteraction bestCandidate = null;
@@ -112,11 +111,9 @@ public class PersonInteraction : MonoBehaviour
 
         if (bestCandidate != null)
         {
-            // Random chance so it does NOT always happen
             if (Random.value > interactionChance)
                 return;
 
-            // prevent both from starting separate coroutines at once
             if (GetInstanceID() < bestCandidate.GetInstanceID())
             {
                 InteractionType type = Random.value < loveChance
@@ -136,8 +133,8 @@ public class PersonInteraction : MonoBehaviour
         isInteracting = true;
         other.isInteracting = true;
 
-        StopAgent(agent);
-        StopAgent(other.agent);
+        PauseMovement(this);
+        PauseMovement(other);
 
         Vector3 midpoint = (transform.position + other.transform.position) * 0.5f;
         Vector3 effectPos = midpoint + Vector3.up * effectHeightOffset;
@@ -159,8 +156,8 @@ public class PersonInteraction : MonoBehaviour
         SetVisible(true);
         other.SetVisible(true);
 
-        ResumeAgent(agent);
-        ResumeAgent(other.agent);
+        ResumeMovement(this);
+        ResumeMovement(other);
 
         StartCoroutine(StartCooldown());
         StartCoroutine(other.StartCooldown());
@@ -198,6 +195,26 @@ public class PersonInteraction : MonoBehaviour
         }
     }
 
+    void PauseMovement(PersonInteraction person)
+    {
+        if (person == null) return;
+
+        if (person.wanderer != null)
+            person.wanderer.PauseWandering();
+        else
+            StopAgent(person.agent);
+    }
+
+    void ResumeMovement(PersonInteraction person)
+    {
+        if (person == null) return;
+
+        if (person.wanderer != null)
+            person.wanderer.ResumeWandering();
+        else
+            ResumeAgent(person.agent);
+    }
+
     void StopAgent(NavMeshAgent nav)
     {
         if (nav == null) return;
@@ -209,6 +226,7 @@ public class PersonInteraction : MonoBehaviour
     void ResumeAgent(NavMeshAgent nav)
     {
         if (nav == null) return;
+        if (!nav.isOnNavMesh) return;
 
         nav.isStopped = false;
     }
@@ -217,6 +235,9 @@ public class PersonInteraction : MonoBehaviour
     {
         Gizmos.color = new Color(1f, 0f, 1f, 0.35f);
         Gizmos.matrix = Matrix4x4.TRS(transform.position, Quaternion.identity, Vector3.one);
-        Gizmos.DrawWireCube(Vector3.zero, new Vector3(detectHalfWidthX * 2f, detectHalfHeightY * 2f, detectHalfDepthZ * 2f));
+        Gizmos.DrawWireCube(
+            Vector3.zero,
+            new Vector3(detectHalfWidthX * 2f, detectHalfHeightY * 2f, detectHalfDepthZ * 2f)
+        );
     }
 }

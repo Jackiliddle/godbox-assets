@@ -59,6 +59,7 @@ public class Wanderer : MonoBehaviour
     bool homeSet;
 
     Vector3 heading;
+    bool isPaused;
 
     const int k_SampleAttempts = 5;
 
@@ -94,6 +95,9 @@ public class Wanderer : MonoBehaviour
 
     void Update()
     {
+        if (isPaused)
+            return;
+
         if (!homeSet || agent == null || !agent.isOnNavMesh)
             return;
 
@@ -111,6 +115,28 @@ public class Wanderer : MonoBehaviour
     void ScheduleNextMove(float delay)
     {
         nextMoveTime = Time.time + Mathf.Max(0f, delay);
+    }
+
+    public void PauseWandering()
+    {
+        isPaused = true;
+
+        if (agent != null)
+        {
+            agent.isStopped = true;
+            agent.ResetPath();
+        }
+    }
+
+    public void ResumeWandering()
+    {
+        isPaused = false;
+
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.isStopped = false;
+            ScheduleNextMove(0.1f);
+        }
     }
 
     void TrySetNextMeanderDestination()
