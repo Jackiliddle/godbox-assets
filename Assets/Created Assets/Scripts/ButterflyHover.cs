@@ -17,13 +17,20 @@ public class ButterflyHoverWander : MonoBehaviour
     public float territoryHalfZ = 1f;
 
     [Header("Orbit")]
-    public float orbitRadius = 0.2f;
-    public float orbitSpeedDegPerSec = 50f;
+    public float orbitRadius = 0.12f;
+    public float orbitSpeedDegPerSec = 35f;
 
     [Header("Hover")]
-    public float baseHeight = 0.35f;
-    public float bobAmount = 0.08f;
-    public float bobSpeed = 2f;
+    [Tooltip("Base hover height above the flower pivot.")]
+    public float baseHeight = 0.03f;
+
+    [Tooltip("Extra offset applied to hover height. Use negative values to push butterflies lower.")]
+    public float hoverHeightOffset = -0.12f;
+
+    [Tooltip("Vertical hover variation.")]
+    public float bobAmount = 0.015f;
+
+    public float bobSpeed = 1.5f;
 
     [Header("Wander Between Flowers")]
     [Tooltip("How far to search for a new flower target.")]
@@ -38,10 +45,10 @@ public class ButterflyHoverWander : MonoBehaviour
 
     [Header("Travel")]
     [Tooltip("How fast it moves its center from one flower to the next.")]
-    public float travelSpeed = 0.8f;
+    public float travelSpeed = 0.6f;
 
     [Tooltip("Extra random drift added to avoid perfect circles.")]
-    public float driftAmount = 0.08f;
+    public float driftAmount = 0.04f;
 
     [Tooltip("How quickly it rotates to face direction of travel.")]
     public float turnSmoothing = 6f;
@@ -144,12 +151,23 @@ public class ButterflyHoverWander : MonoBehaviour
     {
         float rad = angleDeg * Mathf.Deg2Rad;
 
-        float r = orbitRadius + Mathf.Sin(Time.time * 0.7f + rad) * 0.05f;
+        float r = orbitRadius + Mathf.Sin(Time.time * 0.7f + rad) * 0.02f;
         float bob = Mathf.Sin(Time.time * bobSpeed + rad) * bobAmount;
 
-        Vector3 circle = new Vector3(Mathf.Cos(rad) * r, 0f, Mathf.Sin(rad) * r);
+        Vector3 circle = new Vector3(
+            Mathf.Cos(rad) * r,
+            0f,
+            Mathf.Sin(rad) * r
+        );
 
-        return virtualCenter + circle + driftOffset + Vector3.up * (baseHeight + bob);
+        float flowerHeight = virtualCenter.y;
+        float finalHeight = flowerHeight + baseHeight + hoverHeightOffset + bob;
+
+        return new Vector3(
+            virtualCenter.x + circle.x + driftOffset.x,
+            finalHeight,
+            virtualCenter.z + circle.z + driftOffset.z
+        );
     }
 
     Vector3 ClampToTerritory(Vector3 p)
@@ -157,7 +175,6 @@ public class ButterflyHoverWander : MonoBehaviour
         Vector3 local = p - homePosition;
         local.x = Mathf.Clamp(local.x, -territoryHalfX, territoryHalfX);
         local.z = Mathf.Clamp(local.z, -territoryHalfZ, territoryHalfZ);
-        local.y = 0f;
 
         return new Vector3(
             homePosition.x + local.x,
@@ -239,7 +256,6 @@ public class ButterflyHoverWander : MonoBehaviour
         orbitRadius = Mathf.Max(0.01f, orbitRadius);
         orbitSpeedDegPerSec = Mathf.Max(0f, orbitSpeedDegPerSec);
 
-        baseHeight = Mathf.Max(0f, baseHeight);
         bobAmount = Mathf.Max(0f, bobAmount);
         bobSpeed = Mathf.Max(0f, bobSpeed);
 
